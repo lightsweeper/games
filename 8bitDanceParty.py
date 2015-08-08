@@ -1,0 +1,3 @@
+
+class EightBitDanceParty():
+    pass
