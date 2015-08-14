@@ -3,24 +3,31 @@ import random
 
 class TwentyFortyEight(LSGame):
 
-    def init(game):  
-        print('2048 init')
+    def init(game):
         game.tiles = [[None for i in range(game.cols)] for i in range(game.rows)]
-        try:
-            game.tiles[random.randint(0,game.rows-1)][random.randint(0,game.cols-1)] = Colors.RED
-            game.tiles[random.randint(0,game.rows-1)][random.randint(0,game.cols-1)] = Colors.RED
-        except:
-            print('caught an error or some shit')
-#        game.tiles = [(random.randint(0,game.rows-1), random.randint(0,game.cols-1), Colors.RED),(random.randint(0,game.rows-1), random.randint(0,game.cols-1), Colors.RED)]
+        game.tiles[random.randint(0,game.rows-1)][random.randint(0,game.cols-1)] = 1
+        game.tiles[random.randint(0,game.rows-1)][random.randint(0,game.cols-1)] = 1
         game.step_zone_width = 1
         
     def heartbeat(game, moves):
         for col in range(len(game.tiles[0])):
             for row in range(len(game.tiles)):
                 if game.tiles[row][col] is not None:
-                    game.display.set(row, col, Shapes.ZERO, game.tiles[row][col])
+                    if game.tiles[row][col] < 7:
+                        game.display.set(row, col, Shapes.ZERO, Colors.colorArrayInts[game.tiles[row][col]])
+                    elif game.tiles[row][col] < 13:
+                        game.display.set(row,col, Shapes.ONE, Colors.colorArrayInts[game.tiles[row][col]] - 6)
                 else:
                     game.display.set(row, col, Shapes.ZERO, Colors.BLACK)
+        lost = True        
+        for row in range(game.rows):
+            for col in range(game.cols):
+                if game.tiles[row][col] is None:
+                    lost = False
+                if game.tiles[row][col] == 7:
+                    game.ended = True
+        if lost:
+            game.ended = True
 
     def stepOn(game, row, col):
         # check if we're shifting in a direction
@@ -42,14 +49,12 @@ class TwentyFortyEight(LSGame):
         elif col >= game.cols - game.step_zone_width:
             game.shiftDirection('right')
         
-        #check for win/loss states
-        pass
         
         # add new tile
         newTile = (random.randint(0,game.rows-1),random.randint(0,game.cols-1))
         while game.tiles[newTile[0]][newTile[1]] is not None:
             newTile = (random.randint(0,game.rows-1),random.randint(0,game.cols-1))
-        game.tiles[newTile[0]][newTile[1]] = Colors.RED
+        game.tiles[newTile[0]][newTile[1]] = 1
         
     def shiftDirection(game,d):
     # the algorithm for shifting is as follows
