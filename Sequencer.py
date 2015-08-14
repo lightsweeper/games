@@ -23,7 +23,12 @@ class Sequencer():
         self.board = None
         #which sounds will play on what tile / beat. Each beat is represented as a set
         #containing the index to the file for every sound that should be played
-        self.beatRows = self.rows - 1
+        if (self.rows - 1) % 2 == 0:
+            self.beatRows = self.rows - 1
+        elif self.rows - 1 > 1:
+            self.beatRows = self.rows - 2
+        else:
+            self.beatRows = 1
         if self.cols >= 8:
             self.beatCols = 8
         elif self.cols >= 4:

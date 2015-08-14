@@ -4,13 +4,23 @@ import random
 class TwentyFortyEight(LSGame):
 
     def init(game):  
-        game.tiles = [(random.randint(0,game.rows-1), random.randint(0,game.cols-1), Colors.RED),(random.randint(0,game.rows-1), random.randint(0,game.cols-1), Colors.RED)]
-        
+        print('2048 init')
+        game.tiles = [[None for i in range(game.cols)] for i in range(game.rows)]
+        try:
+            game.tiles[random.randint(0,game.rows-1)][random.randint(0,game.cols-1)] = Colors.RED
+            game.tiles[random.randint(0,game.rows-1)][random.randint(0,game.cols-1)] = Colors.RED
+        except:
+            print('caught an error or some shit')
+#        game.tiles = [(random.randint(0,game.rows-1), random.randint(0,game.cols-1), Colors.RED),(random.randint(0,game.rows-1), random.randint(0,game.cols-1), Colors.RED)]
         game.step_zone_width = 1
         
     def heartbeat(game, moves):
-        for tile in game.tiles:
-            game.display.set(tile[0], tile[1], Shapes.ZERO, tile[2])
+        for col in range(len(game.tiles[0])):
+            for row in range(len(game.tiles)):
+                if game.tiles[row][col] is not None:
+                    game.display.set(row, col, Shapes.ZERO, game.tiles[row][col])
+                else:
+                    game.display.set(row, col, Shapes.ZERO, Colors.BLACK)
 
     def stepOn(game, row, col):
         # check if we're shifting in a direction
@@ -18,11 +28,13 @@ class TwentyFortyEight(LSGame):
         if row < game.step_zone_width:
             if col < game.step_zone_width or col >= game.cols - game.step_zone_width:
                 print('corner {0},{1}'.format(row,col))
+                return
             else:
                 game.shiftDirection('up')
         elif row >= game.rows - game.step_zone_width:
             if col < game.step_zone_width or col >= game.cols - game.step_zone_width:
                 print('corner {0},{1}'.format(row,col))
+                return
             else:
                 game.shiftDirection('down')
         elif col <= game.step_zone_width:
@@ -30,7 +42,15 @@ class TwentyFortyEight(LSGame):
         elif col >= game.cols - game.step_zone_width:
             game.shiftDirection('right')
         
-
+        #check for win/loss states
+        pass
+        
+        # add new tile
+        newTile = (random.randint(0,game.rows-1),random.randint(0,game.cols-1))
+        while game.tiles[newTile[0]][newTile[1]] is not None:
+            newTile = (random.randint(0,game.rows-1),random.randint(0,game.cols-1))
+        game.tiles[newTile[0]][newTile[1]] = Colors.RED
+        
     def shiftDirection(game,d):
     # the algorithm for shifting is as follows
     # # start with the row or column that is the furthest to the direction which we are moving,
@@ -38,3 +58,57 @@ class TwentyFortyEight(LSGame):
     # # for all tiles, moving one row or column further away from the row or column which we're
     # # moving everything towards.
         print('shift ' + d)
+        if d is 'up':
+            for row in range(game.rows):
+                for col in range(game.cols):
+                    if game.tiles[row][col] is not None:
+                        currRow = row - 1
+                        while currRow >= 0 and game.tiles[currRow][col] is None:
+                            game.tiles[currRow][col] = game.tiles[currRow+1][col]
+                            game.tiles[currRow+1][col] = None
+                            currRow -= 1
+                        currRow += 1
+                        if currRow > 0 and game.tiles[currRow][col] == game.tiles[currRow-1][col]:
+                            game.tiles[currRow][col] = None
+                            game.tiles[currRow-1][col] += 1
+        if d is 'down':
+            for row in range(game.rows-1, -1, -1):
+                for col in range(game.cols):
+                    if game.tiles[row][col] is not None:
+                        currRow = row + 1
+                        while currRow < game.rows and game.tiles[currRow][col] is None:
+                            game.tiles[currRow][col] = game.tiles[currRow-1][col]
+                            game.tiles[currRow-1][col] = None
+                            currRow += 1
+                        currRow -= 1
+                        if currRow < game.rows-1 and game.tiles[currRow][col] == game.tiles[currRow-1][col]:
+                            game.tiles[currRow][col] = None
+                            game.tiles[currRow+1][col] += 1
+        if d is 'left':
+            for col in range(game.cols):
+                for row in range(game.rows-1, -1, -1):
+                    if game.tiles[row][col] is not None:
+                        currCol = col - 1
+                        while currCol >= 0 and game.tiles[row][currCol] is None:
+                            game.tiles[row][currCol] = game.tiles[row][currCol+1]
+                            game.tiles[row][currCol+1] = None
+                            currCol -= 1
+                        currCol += 1
+                        if currCol > 0 and game.tiles[row][currCol] == game.tiles[row][currCol-1]:
+                            game.tiles[row][currCol] = None
+                            game.tiles[row][currCol-1] += 1
+        if d is 'right':
+            for col in range(game.cols-1, -1, -1):
+                for row in range(game.rows):                
+                    if game.tiles[row][col] is not None:
+                        currCol = col + 1
+                        while currCol < game.cols and game.tiles[row][currCol] is None:
+                            game.tiles[row][currCol] = game.tiles[row][currCol-1]
+                            game.tiles[row][currCol-1] = None
+                            currCol += 1
+                        currCol -= 1
+                        if currCol < game.cols-1 and game.tiles[row][currCol] == game.tiles[row][currCol+1]:
+                            game.tiles[row][currCol] = None
+                            game.tiles[row][currCol+1] += 1
+        for row in game.tiles:
+            print(row)
