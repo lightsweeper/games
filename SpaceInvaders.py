@@ -1,0 +1,3 @@
+
+class SpaceInvaders():
+    pass
