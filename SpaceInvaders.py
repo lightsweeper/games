@@ -9,6 +9,7 @@ import math
 import random
 
 LASER_SPEED = 2 # frames
+MIN_DOWNWARD_DELAY = 60 # frames to wait before moving the ships down again
 
 class SpaceInvaders(LSGame):
     def init(game):
@@ -49,10 +50,11 @@ class SpaceInvaders(LSGame):
                 game.moveShips('right')
                 game.distFromFirstCol += 1
                 game.distFromLastCol -= 1
-            if random.random() < 0.01 * game.speed:
+            if random.random() < 0.05 * game.speed and game.frameCounter > (MIN_DOWNWARD_DELAY / game.speed):
+                game.frameCounter = 0                
                 game.moveShips('down')
                 game.distFromBottom -= 1
-                ship = random.randint(0,len(game.enemyShips)-1)# % len(game.enemyShips)
+                ship = random.randint(0,len(game.enemyShips) - 1)
                 for col in range(game.distFromFirstCol, game.cols-game.distFromLastCol):
                     game.ships[1][col] = ship            
 
@@ -66,40 +68,49 @@ class SpaceInvaders(LSGame):
                         game.display.set(row, col, game.enemyShips[i], game.enemyColors[i])  
                     elif row != game.rows-1:
                         game.display.set(row,col,Shapes.ZERO,Colors.BLACK)
-            
             game.display.setRow(0, Shapes.UNDERSCORE, Colors.YELLOW)
 
+            # display game score and set speed
             if game.score < 20:
                 game.display.set(0, 0, Shapes.digitToHex(math.floor(game.score / 10)), Colors.WHITE)
                 game.display.set(0, 1, Shapes.digitToHex(game.score % 10), Colors.WHITE)
-                #game.display.setMessage(0, 'saturn', color = Colors.RANDOM())    
             elif game.score < 40:
                 game.display.setMessage(0, 'yes', color = Colors.RANDOM())
+                game.speed = 1.1
             elif game.score < 60:
                 game.display.setMessage(0, 'lasers', color = Colors.RANDOM())
+                game.speed = 1.2
             elif game.score < 80:
                 game.display.setMessage(0, 'cats', color = Colors.RANDOM())
+                game.speed = 1.3
             elif game.score < 100:
                 game.display.setMessage(0, 'pizza', color = Colors.RANDOM())
+                game.speed = 1.4
             elif game.score < 150:
                 game.display.setMessage(0, 'space', color = Colors.RANDOM())
+                game.speed = 1.5
             elif game.score < 200:
-                game.display.setMessage(0, 'moon', color = Colors.RANDOM())
+                game.display.setMessage(0, 'orbit', color = Colors.RANDOM())
+                game.speed = 1.6
             elif game.score < 300:
-                game.display.setMessage(0, 'mars', color = Colors.RANDOM())
+                game.display.setMessage(0, 'aliens', color = Colors.RANDOM())
+                game.speed = 1.7
             elif game.score < 400:
-                game.display.setMessage(0, 'ceres', color = Colors.RANDOM())
+                game.display.setMessage(0, 'ufo', color = Colors.RANDOM())
+                game.speed = 1.8
             elif game.score < 500:
                 game.display.setMessage(0, 'jupiter', color = Colors.RANDOM())
+                game.speed = 1.9
             elif game.score < 600:
                 game.display.setMessage(0, 'saturn', color = Colors.RANDOM())
+                game.speed = 2.0
             elif game.score < 700:
                 game.display.setMessage(0, 'pluto', color = Colors.RANDOM())
-            elif game.score < 2000:
-                game.display.setMessage(0, 'galaxy', color = Colors.RANDOM())
+                game.speed = 2.1
             else:
-                game.display.setMessage(0, 'infinity', color = Colors.RANDOM())
-# alphabet: a,b,c,d,e,f,g,h,i,j,k,l,n,o,p,q,r,t,u,s,v,x,y,z
+                game.display.setMessage(0, 'galaxy', color = Colors.RANDOM())
+                game.speed += 0.005
+
             # display lasers and check for destroyed ships
             for laser in game.lasers:
                 game.display.set(laser[0],laser[1],Shapes.SEG_C,Colors.RED)            
@@ -116,18 +127,15 @@ class SpaceInvaders(LSGame):
                     laser[2] += 1
                 
             game.lasers = [laser for laser in game.lasers if laser[0] > 0]
-
-            #if won:
-            #    game.state = 'won'
-            #    game.audio.stopSounds()
-            #    game.audio.playSound('Success.wav')
             
             if game.distFromBottom == 0:
                 game.state = 'lost'
                 game.audio.stopSounds()
                 game.audio.playSound('big explosion.wav')
+                game.frameCounter = 0
 
-            game.speed += 0.001
+            game.frameCounter += 1
+
         if game.state is 'lost':
             #if game.frameCounter == 1:   
             if game.frameCounter < 100:
@@ -135,16 +143,17 @@ class SpaceInvaders(LSGame):
                 if game.frameCounter % 5 == 0:
                     game.display.set(random.randint(0,game.rows-1),random.randint(0,game.cols-1),
                                      Shapes.H, Colors.RED) 
+                game.display.setMessage(0, str(game.score), color=Colors.WHITE)
             else:
                 game.ended = True
-        if game.state is 'won':
-            if game.frameCounter < 100:
-                game.frameCounter += 1
-                if game.frameCounter % 5 == 0:
-                    game.display.set(random.randint(0,game.rows-1),random.randint(0,game.cols-1),
-                                     Shapes.ZERO, Colors.RANDOM()) 
-            else:
-                game.ended = True
+#        if game.state is 'won':
+#            if game.frameCounter < 100:
+#                game.frameCounter += 1
+#                if game.frameCounter % 5 == 0:
+#                    game.display.set(random.randint(0,game.rows-1),random.randint(0,game.cols-1),
+#                                     Shapes.ZERO, Colors.RANDOM()) 
+#            else:
+#                game.ended = True
 
     def moveShips(game,d):
         if d == 'left':
