@@ -731,12 +731,6 @@ class Minesweeper(LSGame):
         board.create_board(game.rows, game.cols, mines)
         game.board = board
         game.animatingEnd = False
-        game.audio.loadSong('BetweenGames1.wav', 'between1')
-        game.audio.loadSong('BetweenGames2.wav', 'between2')
-        game.audio.loadSong('BetweenGames3.wav', 'between3')
-        game.audio.loadSong('BetweenGames4.wav', 'between4')
-        game.audio.shuffleSongs()
-        game.audio.setSongVolume(0)
         game.firstStep = True
         game.updateBoard(game.board)
         game.display.setAll(Shapes.ZERO, Colors.GREEN)
