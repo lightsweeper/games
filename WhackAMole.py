@@ -5,7 +5,7 @@ import random
 
 from lightsweeper.lsapi import *
 
-from lightsweeper.lsgame import HighScores
+#from lightsweeper.lsgame import HighScores
 from lightsweeper.lsgame import CountdownTimer
 from lightsweeper.lsgame import EnterName
 
@@ -16,6 +16,7 @@ EXTREME_TIMEOUT = 4
 class WhackAMole(LSGame):
 
     def init(self):
+        self.HighScoreWins()
         self.moleTimeout = TIMEOUT
         self.startTimestamp = -1
         self.moles = []
@@ -24,13 +25,13 @@ class WhackAMole(LSGame):
         self.moleAppearanceTimes = [29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10,
                                     9, 8, 7, 6, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1]
         self.score = 0
-        self.highScores = HighScores()
+  #      self.highScores = HighScores()
         self.winScreen = False
         self.winScreenTimestamp = -1
         self.enterName = None
         self.handlesEvents = True
         self.timer = CountdownTimer(30, self.timerFinished)
-        self.showingHighScores = False
+   #     self.showingHighScores = False
 
     def stepOn(self, row, col):
         if (row, col) in self.moles:
@@ -43,18 +44,18 @@ class WhackAMole(LSGame):
         #show appropriate win screen
         ts = time.time()
         if self.winScreen:
-            if self.enterName is not None:
-                self.enterName.heartbeat(activeSensors)
-                if self.enterName.ended:
-                    self.highScores.saveHighScore(self.enterName.currentText, self.score)
-                    self.enterName = None
-                    self.winScreenTimestamp = ts
-            elif ts - self.winScreenTimestamp > 6:
-                self.over()
-            elif not self.showingHighScores:
-                self.display.setAll(Shapes.ZERO, Colors.BLACK)
-                self.display.showHighScores(self.highScores.getHighScores())
-                self.showingHighScores = True                      # TODO: pass highscores to LSGameEngine with game.over
+       #     if self.enterName is not None:
+       #         self.enterName.heartbeat(activeSensors)
+       #         if self.enterName.ended:
+       #             self.highScores.saveHighScore(self.enterName.currentText, self.score)
+       #             self.enterName = None
+       #             self.winScreenTimestamp = ts
+        #    if ts - self.winScreenTimestamp > 6:
+            self.over(self.score)
+        #    elif not self.showingHighScores:
+        #        self.display.setAll(Shapes.ZERO, Colors.BLACK)
+        #        self.display.showHighScores(self.highScores.getHighScores())
+        #        self.showingHighScores = True                      # TODO: pass highscores to LSGameEngine with game.over
             return
 
         #update timer
@@ -110,8 +111,8 @@ class WhackAMole(LSGame):
         self.audio.playSound("Success.wav")
         self.winScreen = True
         self.winScreenTimestamp = time.time()
-        if self.highScores.isHighScore(self.score):
-            self.enterName = EnterName(self.display, self.rows, self.cols, highScore=str(self.score))
+     #   if self.highScores.isHighScore(self.score):
+     #       self.enterName = EnterName(self.display, self.rows, self.cols, highScore=str(self.score))
 
 def main():
     gameEngine = LSGameEngine(WhackAMole)
