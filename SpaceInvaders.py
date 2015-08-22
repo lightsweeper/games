@@ -10,20 +10,22 @@ import random
 
 class SpaceInvaders(LSGame):
     def init(game):
-        game.enemyShips = [Shapes.H + Shapes.SEG_D, Shapes.o + Shapes.SEG_A, Shapes.SEG_B + Shapes.SEG_E + Shapes.SEG_G, Shapes.SEG_A + Shapes.SEG_C  + Shapes.SEG_E]
-        game.enemyColors = [Colors.RANDOM() for ship in game.enemyShips]
+        game.enemyShips = [Shapes.H + Shapes.SEG_D, Shapes.o + Shapes.SEG_A, Shapes.SEG_B + Shapes.SEG_E + Shapes.SEG_G, Shapes.SEG_A + Shapes.SEG_C  + Shapes.SEG_E, Shapes.H - Shapes.SEG_G]
+        game.enemyColors = [Colors.RANDOM(game.enemyShips) for ship in game.enemyShips]
         
         i = 0
         game.ships = [[None for col in range(game.cols)] for row in range(game.rows)]
-        for row in range(1, game.rows - 3):
+        for row in range(1, game.rows - 2):
             for col in range(1, game.cols - 2):
                 game.ships[row][col] = i
-            i = (i + 1) % len(game.enemyShips)
+            i = random.randint(0,len(game.enemyShips)-1)# % len(game.enemyShips)
         game.distFromFirstCol = 1
         game.distFromLastCol = 2
-        game.distFromBottom = 3      
+        game.distFromBottom = 3
+
+        game.audio.playSound('Space invaders remix.ogg')
         
-    def heartbeat(game, moves):  
+    def heartbeat(game, moves):
         won = True
         # display ships and check for win state
         for row in range(game.rows):
@@ -31,13 +33,14 @@ class SpaceInvaders(LSGame):
                 if game.ships[row][col] is not None:
                     won = False
                     i = game.ships[row][col]
-                    game.display.set(row,col,game.enemyShips[i], game.enemyColors[i])  
+                    game.display.set(row, col, game.enemyShips[i], game.enemyColors[i])  
                 else:
                     game.display.set(row,col,Shapes.ZERO,Colors.BLACK)
         game.display.setRow(game.rows-1, Shapes.UNDERSCORE, Colors.WHITE)
 
         if won:
             game.ended = True
+            game.audio.stopSounds()
         
         # recalculate how far the bottom row of ships is from the bottom
         for row in range(game.rows-1, -1, -1):
@@ -45,20 +48,21 @@ class SpaceInvaders(LSGame):
                 if game.ships[row][col] is not None:
                     game.distFromBottom = game.rows - row - 1
 
-        if random.randint(0, game.frameRate * 3) == 0 and game.distFromFirstCol > 0:
+        if random.randint(0, game.frameRate * 2) == 0 and game.distFromFirstCol > 0:
             game.moveShips('left')
             game.distFromFirstCol -= 1
             game.distFromLastCol += 1
-        if random.randint(0, game.frameRate * 3) == 0 and game.distFromLastCol > 0:
+        if random.randint(0, game.frameRate * 2) == 0 and game.distFromLastCol > 0:
             game.moveShips('right')
             game.distFromFirstCol += 1
             game.distFromLastCol -= 1
-        if random.randint(0, game.frameRate * 5) == 0:
+        if random.randint(0, game.frameRate * 10) == 0:
             game.moveShips('down')
             game.distFromBottom -= 1
 
         if game.distFromBottom == 0:
             game.ended = True
+            game.audio.stopSounds()
 
     def moveShips(game,d):
         if d == 'left':

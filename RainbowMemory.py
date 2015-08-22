@@ -29,8 +29,9 @@ class RainbowMemory(LSGame):
         self.displayingDigit = False
         self.currentDigit = 1
         self.currentColors = [Colors.RED, Colors.YELLOW, Colors.GREEN, Colors.CYAN, Colors.BLUE, Colors.MAGENTA]
-        self.tile = (random.randint(0,self.display.rows-1), random.randint(0,self.display.cols-1))
-        self.tileChain = [(random.randint(0,self.display.rows-1), random.randint(0,self.display.cols-1))]
+        self.tile = (random.randint(0,2),
+                     random.randint(0,self.display.cols-1))
+        self.tileChain = [self.tile]
         self.steppedOnDigit = False
         self.lost = False
         self.audio.playSound('8bit/8bit-loop.wav', 0.35)
@@ -38,7 +39,7 @@ class RainbowMemory(LSGame):
 
     def heartbeat(self, sensorsChanged):
         self.frame += 1
-        
+
         if self.state is 'show digits':
             if not self.stateInitialized:
                 self.audio.stopSounds()
@@ -46,16 +47,20 @@ class RainbowMemory(LSGame):
                 self.stateInitialized = True
                 self.currentDigit = 1
                 if not self.beingPlayed:
-                    self.tileChain = [(random.randint(0,self.display.rows-1), random.randint(0,self.display.cols-1))]
+                    self.tile = (random.randint(0,2),
+                     random.randint(0,self.display.cols-1))
+                    self.tileChain = [self.tile]
                 print(self.state, self.currentDigit, len(self.tileChain))
+            # display the next digit
             if self.currentDigit <= len(self.tileChain) and self.frame > DISPLAY_DIGIT:
                 self.tile = self.tileChain[self.currentDigit - 1]
                 self.audio.playSound('ding_1.wav')
                 self.rainbowScreen()
-                self.display.set(self.tile[0],self.tile[1], Shapes.digitToHex(self.currentDigit), (self.currentDigit % 6) + 1)
+                self.display.set(self.tile[0], self.tile[1], Shapes.digitToHex(self.currentDigit), (self.currentDigit % 6) + 1)
                 self.currentDigit += 1
                 self.frame = 0
             elif self.frame > DISPLAY_DIGIT:
+                self.currentDigit = 1
                 self.state = 'wait for input'
                 self.stateInitialized = False
         elif self.state is 'wait for input':
@@ -65,7 +70,6 @@ class RainbowMemory(LSGame):
                 self.rainbowScreen()
                 self.frame = 0
                 self.stateInitialized = True
-                self.currentDigit = 1
             if self.frame > WAIT_FOR_INPUT:
                 if not self.beingPlayed: # this is for when the game isn't being actively played
                     self.state = 'rainbow'
@@ -73,7 +77,12 @@ class RainbowMemory(LSGame):
                 elif self.currentDigit > len(self.tileChain):
                     self.state = 'rainbow'
                     self.stateInitialized = False
-                    self.tileChain.append((random.randint(0,self.display.rows-1), random.randint(0,self.display.cols-1)))
+                    prevTile = self.tileChain[-1]
+                    self.tile = (random.randint(max(0,prevTile[0]-2),
+                                  min(self.display.rows-1,prevTile[0]+2)),
+                                 random.randint(max(0,prevTile[1]-2),
+                                  min(self.display.cols-1,prevTile[1]+2)))
+                    self.tileChain.append(self.tile)
             if self.frame == TIMEOUT: # this will only ever be reached when it's being played
                 self.audio.playSound('tick_tock.wav')
             if self.frame > TIMEOUT + 30:
@@ -109,7 +118,7 @@ class RainbowMemory(LSGame):
             self.rainbowScreen(Shapes.digitToHex(self.frame % 10))
             if self.frame > 20:
                 self.ended
-        if self.currentDigit > 3 and self.state != 'won':
+        if self.currentDigit > 9 and self.state is 'wait for input':
                 self.audio.stopSounds()
                 self.state = 'won'
                 self.frame = 0
@@ -119,7 +128,8 @@ class RainbowMemory(LSGame):
             self.display.setRow(i, shape, Colors.colorArrayInts[(i % 7) + 1])
 
     def stepOn(game, row, col):
-        game.audio.stopSounds()
+        if game.state is not 'won' and game.state is not 'lost':
+            game.audio.stopSounds()
         if game.state == 'wait for input':
             if (row,col) == game.tile:
                 game.steppedOnDigit = True
