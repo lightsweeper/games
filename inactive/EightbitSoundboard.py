@@ -27,7 +27,6 @@ class EightbitSoundboard(LSGame):
 
     def stepOn(self, row, col):
         self.playTileSound(row, col)
-        #self.audio.playLoadedSound('casioC4')
         self.display.setColor(row, col, Colors.RANDOM())
 
     def playTileSound(self, row, col):

@@ -836,8 +836,6 @@ class EndAnimation:
     def __init__(self, win, display, lastMove, mines):
         self.rows = display.rows
         self.cols = display.cols
-        print(self.rows)
-        print(self.cols)
         self.ended = False
         self.currentFrame = None
         self.frames = []
