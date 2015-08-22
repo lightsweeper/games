@@ -722,6 +722,7 @@ class Minesweeper(LSGame):
     staleDisplay = defaultdict(lambda: defaultdict(str))
 
     def init(game):
+        game.LowTimeWins()
         board = Board()
         mines = random.randint(int(game.cols*game.rows*.1), int(game.cols*game.rows*.3))
         if mines is 0:
@@ -739,6 +740,8 @@ class Minesweeper(LSGame):
         game.firstStep = True
         game.updateBoard(game.board)
         game.display.setAll(Shapes.ZERO, Colors.GREEN)
+        game.startTime = time.time()
+        game.isWon = False
 
 
     def stepOn(game, row, col):
@@ -767,6 +770,7 @@ class Minesweeper(LSGame):
         if not game.board.is_playing and not game.animatingEnd:
             if game.board.is_solved():
                 print("Well done! You solved the board!")
+                game.isWon = True
                 game.endAnim = EndAnimation(True, game.display, game.lastMove, game.board.list_mines())
                 game.animatingEnd = True
                 game.audio.playSound("Success.wav")
@@ -782,8 +786,10 @@ class Minesweeper(LSGame):
                 game.display.setFrame(frame)
             if game.endAnim.ended:
                 game.endAnim.animation.play(game.display, frameRate=10)
-                game.over()
-
+                if game.isWon:
+                    game.over(int(time.time() - game.startTime))
+                else:
+                    game.over()
 
     # currently this is just iterating across all the cells in the internal game state and pushing
     # the corresponding shape/color to the display for the given tile's position. a slightly better design would
