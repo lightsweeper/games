@@ -7,6 +7,7 @@ Step on the bottom row to shoot at the ships from that position. May the best pl
 from lightsweeper.lsapi import *
 import math
 import random
+import time
 
 LASER_SPEED = 2 # frames
 MIN_DOWNWARD_DELAY = 60 # frames to wait before moving the ships down again
@@ -27,7 +28,9 @@ class SpaceInvaders(LSGame):
         game.distFromBottom = 2
 
         game.lasers = [] # (row, col, frames since last move)
-        game.audio.playSound('Space invaders remix.ogg')
+        game.audio.playlist.add('Space invaders remix.ogg')
+        game.audio.playlist.fadeTime=2000 # Time to fade in milliseconds
+        game.audio.playlist.play(fadeIn=True)
         game.state = 'playing'
         game.frameCounter = 0
         
@@ -136,7 +139,7 @@ class SpaceInvaders(LSGame):
             
             if game.distFromBottom == 0:
                 game.state = 'lost'
-                game.audio.stopSounds()
+                game.audio.stopMusic()
                 game.audio.playSound('big explosion.wav')
                 game.frameCounter = 0
 
