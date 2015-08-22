@@ -86,14 +86,17 @@ class SpaceInvaders(LSGame):
             elif game.score < 100:
                 game.display.setMessage(0, 'pizza', color = Colors.RANDOM())
                 game.speed = 1.4
+            elif game.score < 125:
+                game.display.setMessage(0, '1337', color = Colors.RANDOM())
+                game.speed = 1.4
             elif game.score < 150:
                 game.display.setMessage(0, 'space', color = Colors.RANDOM())
                 game.speed = 1.5
             elif game.score < 200:
-                game.display.setMessage(0, 'orbit', color = Colors.RANDOM())
+                game.display.setMessage(0, 'star', color = Colors.RANDOM())
                 game.speed = 1.6
             elif game.score < 300:
-                game.display.setMessage(0, 'aliens', color = Colors.RANDOM())
+                game.display.setMessage(0, 'alien', color = Colors.RANDOM())
                 game.speed = 1.7
             elif game.score < 400:
                 game.display.setMessage(0, 'ufo', color = Colors.RANDOM())
@@ -106,6 +109,9 @@ class SpaceInvaders(LSGame):
                 game.speed = 2.0
             elif game.score < 700:
                 game.display.setMessage(0, 'pluto', color = Colors.RANDOM())
+                game.speed = 2.1
+            elif game.score < 800:
+                game.display.setMessage(0, 'neutron', color = Colors.RANDOM())
                 game.speed = 2.1
             else:
                 game.display.setMessage(0, 'galaxy', color = Colors.RANDOM())
