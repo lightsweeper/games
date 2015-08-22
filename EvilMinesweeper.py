@@ -779,8 +779,10 @@ class EvilMinesweeper(LSGame):
                     if i > 100:
                         break
                 if not game.board.board[rand_row][rand_col].is_visible and game.board.has_visible_neighbor(rand_row, rand_col):
+                    # OMG SO EVIL
                     game.board.board[rand_row][rand_col].is_mine = True
                     print("placed a new mine at {0},{1}  ".format(rand_row,rand_col))
+                    game.audio.playSound('spooky_zone.ogg')
         # do normal graphical updates            
             game.updateBoard(game.board)
         if not game.board.is_playing and not game.animatingEnd:
@@ -790,7 +792,8 @@ class EvilMinesweeper(LSGame):
                 game.animatingEnd = True
                 game.audio.playSound("Success.wav")
             else:
-                #self.audio.playSound("Explosion.wav")
+                # YOU LOSE AT LIFE
+                game.audio.playSound('BowserLaugh.ogg')
                 game.board.show_all()
                 game.endAnim = EndAnimation(False, game.display, game.lastMove, game.board.list_mines())
                 game.animatingEnd = True
