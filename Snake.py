@@ -13,6 +13,7 @@ BOTTOM = 0
 class Snake(LSGame):
 
     def init (game):
+        game.iterator = 0
         game.speed = 2
         game.state = list()             # This will keep track of the state of the board
         for r in range(0, game.rows):
@@ -29,6 +30,27 @@ class Snake(LSGame):
         game.snakeFood = game.feedTheSnake()
         game.frameRate = 0
 
+    def snakeBait(game, rowCol):
+        game.iterator += 1
+        row, col = rowCol
+        if game.iterator % 2 == 0:
+            game.display.set(row, col, Shapes.ZERO, Colors.WHITE)
+        elif game.iterator % 3 == 0:
+            game.display.clear(row, col)
+            game.display.set(row-1, col, Shapes.SEG_D, Colors.WHITE)
+            game.display.set(row, col+1, Shapes.SEG_E+Shapes.SEG_F, Colors.WHITE)
+            game.display.set(row+1, col, Shapes.SEG_A, Colors.WHITE)
+            game.display.set(row, col-1, Shapes.SEG_B+Shapes.SEG_C, Colors.WHITE)
+        else:
+            game.display.set(row, col, Shapes.DASH, Colors.WHITE)
+
+    def stepOff (game, row, col):
+        game.display.clear(row, col)
+        game.display.clear(row-1, col)
+        game.display.clear(row, col+1)
+        game.display.clear(row+1, col)
+        game.display.clear(row, col-1)
+
     def heartbeat(game, activeSensors):
         game.updateMorsel()
         if len(activeSensors) == 0:
@@ -39,6 +61,7 @@ class Snake(LSGame):
             game.straight = 0
 
             for rowCol in activeSensors:
+                game.snakeBait(rowCol)
                 row = rowCol[0]
                 col = rowCol[1]
                 if game.nearHead(row, col):
