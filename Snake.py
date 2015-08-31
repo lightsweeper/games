@@ -71,7 +71,7 @@ class Snake(LSGame):
                 row = rowCol[0]
                 col = rowCol[1]
                 if game.nearHead(row, col):
-                    game.flee(row, col)
+                    game.frameRate = 0
                 else:
                     game.follow(row, col)
             game.moveSnake(game.left, game.right)
