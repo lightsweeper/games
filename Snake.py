@@ -35,16 +35,23 @@ class Snake(LSGame):
         row, col = rowCol
         if game.iterator % 2 == 0:
             game.display.set(row, col, Shapes.ZERO, Colors.WHITE)
-        elif game.iterator % 3 == 0:
+        elif game.iterator % 3 == 0: # Last step
             game.display.clear(row, col)
             game.display.set(row-1, col, Shapes.SEG_D, Colors.WHITE)
             game.display.set(row, col+1, Shapes.SEG_E+Shapes.SEG_F, Colors.WHITE)
             game.display.set(row+1, col, Shapes.SEG_A, Colors.WHITE)
             game.display.set(row, col-1, Shapes.SEG_B+Shapes.SEG_C, Colors.WHITE)
-        else:
+            game.iterator = 0
+        else: # First step
+            game.display.clear(row, col)
+            game.display.clear(row-1, col)
+            game.display.clear(row, col+1)
+            game.display.clear(row+1, col)
+            game.display.clear(row, col-1)
             game.display.set(row, col, Shapes.DASH, Colors.WHITE)
 
     def stepOff (game, row, col):
+        game.iterator = 0
         game.display.clear(row, col)
         game.display.clear(row-1, col)
         game.display.clear(row, col+1)
@@ -52,7 +59,6 @@ class Snake(LSGame):
         game.display.clear(row, col-1)
 
     def heartbeat(game, activeSensors):
-        game.updateMorsel()
         if len(activeSensors) == 0:
             game.slitherForward()
         else:
@@ -69,6 +75,7 @@ class Snake(LSGame):
                 else:
                     game.follow(row, col)
             game.moveSnake(game.left, game.right)
+        game.updateMorsel()
 
     def stepOn(game, row, col):
         if game.frameRate is 0:
