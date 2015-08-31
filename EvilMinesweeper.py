@@ -738,7 +738,7 @@ class EvilMinesweeper(LSGame):
         game.animatingEnd = False
         game.firstStep = True
         game.updateBoard(game.board)
-        game.display.setAll(Shapes.ZERO, Colors.GREEN)
+        game.display.setAll(Shapes.ZERO, Colors.RED)
 
 
     def stepOn(game, row, col):
@@ -821,7 +821,7 @@ class EvilMinesweeper(LSGame):
                             game.display.set(row, col, Shapes.DASH, Colors.MAGENTA)
                     elif cell == '.':
                         if staleCell != ".":
-                            game.display.set(row, col, Shapes.ZERO, Colors.GREEN)
+                            game.display.set(row, col, Shapes.ZERO, Colors.RED)
                     elif cell == ' ' or cell == '':
                         if staleCell != " " and staleCell != "":
                             game.display.set(row, col, Shapes.DASH, Colors.BLACK)
